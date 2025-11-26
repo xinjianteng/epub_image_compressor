@@ -1,0 +1,7 @@
+PS F:\xjt_work\epub_image_compressor> flutter build windows --release
+
+F:\xjt_work\epub_image_compressor\windows\runner\Runner.rc(55): error RC2175: resource file resources\app_icon.ico is not in 3.00 format [F:\xjt_work\epub_image_compressor\build\window
+s\x64\runner\epub_image_compressor.vcxproj]
+Building Windows application...                                    35.9s
+Build process failed.
+PS F:\xjt_work\epub_image_compressor>
