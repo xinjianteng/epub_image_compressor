@@ -55,10 +55,34 @@ class _TimelineViewState extends State<TimelineView> {
               Container(
                 height: 50,
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  '任务日志:',
-                  style: widget.logic.state
-                      .buildTextStyle(16, fontWeight: FontWeight.bold),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '任务日志:',
+                        style: widget.logic.state
+                            .buildTextStyle(16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: widget.logic.state.timeline.isEmpty
+                          ? null
+                          : widget.logic.clearTimeline,
+                      icon: const Icon(
+                        Icons.delete_sweep,
+                        size: 16,
+                      ),
+                      label: Text(
+                        '清除',
+                        style: widget.logic.state.buildTextStyle(10),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        minimumSize: const Size(0, 32),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               widget.logic.state.buildHorizontalDivider(),

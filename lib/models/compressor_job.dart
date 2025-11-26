@@ -43,6 +43,12 @@ class CompressorJob {
   /// 节省的字节数
   final RxInt savedBytes = 0.obs;
 
+  /// 原始文件大小
+  final RxInt originalBytes = 0.obs;
+
+  /// 压缩后文件大小
+  final RxInt compressedBytes = 0.obs;
+
   /// 消息信息
   final RxString message = ''.obs;
 
@@ -74,4 +80,9 @@ class CompressorJob {
   ///
   /// [text] 要添加的日志文本
   void addLog(String text) => logs.add(AppUtil.getTime()+text);
+
+  String get formattedOriginalSize => AppUtil.formatSize(originalBytes.value);
+
+  String get formattedCompressedSize =>
+      compressedBytes.value > 0 ? AppUtil.formatSize(compressedBytes.value) : '--';
  }

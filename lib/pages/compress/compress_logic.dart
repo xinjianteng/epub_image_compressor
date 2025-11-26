@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:epub_image_compressor/utils/app_util.dart';
 import 'package:epub_image_compressor/values/colors.dart';
 import 'package:file_picker/file_picker.dart';
@@ -50,13 +52,15 @@ class CompressLogic extends GetxController {
           state.newJobs.any((job) => p.equals(job.inputPath, path));
       if (!alreadyExists) {
         final autoDir = _buildTimestampDir(path);
-        state.newJobs.add(
-          CompressorJob(
-            inputPath: path,
-            outputDir: outputDir.value.isEmpty ? null : outputDir.value,
-            suggestedOutputDir: autoDir,
-          ),
+        final job = CompressorJob(
+          inputPath: path,
+          outputDir: outputDir.value.isEmpty ? null : outputDir.value,
+          suggestedOutputDir: autoDir,
         );
+        if (file.size > 0) {
+          job.originalBytes.value = file.size;
+        }
+        state.newJobs.add(job);
       }
     }
     update();
@@ -134,6 +138,7 @@ class CompressLogic extends GetxController {
     job.progress.value = 0;
     job.message.value = '处理中...';
     job.logs.clear();
+    job.originalBytes.value = await _getFileSize(job.inputPath);
 
     final targetDir = outputDir.value.isNotEmpty
         ? outputDir.value
@@ -160,6 +165,7 @@ class CompressLogic extends GetxController {
 
       job.outputPath = summary.outputPath;
       job.savedBytes.value = summary.savedBytes;
+      job.compressedBytes.value = await _getFileSize(summary.outputPath);
 
       if (_token?.isCancelled == true || summary.cancelled) {
         job.status.value = JobStatus.cancelled;
@@ -195,6 +201,10 @@ class CompressLogic extends GetxController {
     if (overflow > 0) {
       logs.removeRange(0, overflow);
     }
+  }
+
+  void clearTimeline() {
+    state.timeline.clear();
   }
 
   /// 浮动按钮按下后的响应处理器。
@@ -247,5 +257,13 @@ class CompressLogic extends GetxController {
         ),
       ],
     );
+  }
+
+  Future<int> _getFileSize(String path) async {
+    try {
+      return await File(path).length();
+    } catch (_) {
+      return 0;
+    }
   }
 }

@@ -328,6 +328,31 @@ class _CompressPageState extends State<CompressPage> {
               '输出址：${job.outputDir ?? job.defaultOutputDir ?? '未确定'}',
               style: state.buildTextStyle(12),
             ),
+            const SizedBox(height: 4),
+            Obx(() {
+              final originalText = job.originalBytes.value > 0
+                  ? AppUtil.formatSize(job.originalBytes.value)
+                  : '--';
+              final compressedText = job.compressedBytes.value > 0
+                  ? AppUtil.formatSize(job.compressedBytes.value)
+                  : '未生成';
+              return Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '原始大小：$originalText',
+                      style: state.buildTextStyle(12),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '压缩后：$compressedText',
+                      style: state.buildTextStyle(12),
+                    ),
+                  ),
+                ],
+              );
+            }),
             const SizedBox(height: 8),
             Obx(
               () => LinearProgressIndicator(
