@@ -2,7 +2,7 @@ class AppStrings {
   static const String appName = 'epub文件图片资源压缩工具';
   static const String appVersion = 'v1.0.1';
   static const String appAuthor = 'XinJianteng';
-  static const String github = 'https://github.com/XinJianteng/epub_image_compress';
+  static const String github = 'https://github.com/xinjianteng/epub_image_compressor';
   static const String appNewVersion = 'https://github.com/xinjianteng/epub_image_compressor/releases';
 
    static const String appTagline = '''- 批量压缩：保持图片名称、路径、格式不变，输出目录可自选或自动生成。

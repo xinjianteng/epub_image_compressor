@@ -91,7 +91,8 @@ class _CompressPageState extends State<CompressPage> {
                 ],
               ),
             ),
-            Text('数值越小，压缩级别越大，压缩后的图片大小越小。默认60', style: state.buildTextStyle(10,color: Colors.red)),
+            Text('数值越小，压缩级别越大，压缩后的图片大小越小。默认60',
+                style: state.buildTextStyle(10, color: Colors.red)),
             state.buildHorizontalDivider(),
             // PNG 等级滑块：控制 PNG 图像的压缩级别（0~9）。
             SizedBox(
@@ -121,7 +122,8 @@ class _CompressPageState extends State<CompressPage> {
                 ],
               ),
             ),
-            Text('数值越小，压缩级别越大，压缩后的图片大小越小。默认6', style: state.buildTextStyle(10,color: Colors.red)),
+            Text('数值越小，压缩级别越大，压缩后的图片大小越小。默认6',
+                style: state.buildTextStyle(10, color: Colors.red)),
             state.buildHorizontalDivider(),
             // 跳过小图开关：启用后将忽略小于指定大小的图片。
             SizedBox(
@@ -228,7 +230,10 @@ class _CompressPageState extends State<CompressPage> {
                         "添加", logic.pickBatchFiles, Icons.playlist_add),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(flex: 1,child: state.buildButton("清空", logic.clearBatch, Icons.clear_all)),
+                  Expanded(
+                      flex: 1,
+                      child: state.buildButton(
+                          "清空", logic.clearBatch, Icons.clear_all)),
                   const SizedBox(width: 10),
                   Expanded(
                     flex: 1,
@@ -324,10 +329,32 @@ class _CompressPageState extends State<CompressPage> {
               '源地址：${job.inputPath}',
               style: state.buildTextStyle(12),
             ),
-            Text(
-              '输出址：${job.outputDir ?? job.defaultOutputDir ?? '未确定'}',
-              style: state.buildTextStyle(12),
-            ),
+            Obx(() {
+              final status = job.status.value;
+              final outputText = job.outputPath ??
+                  job.outputDir ??
+                  job.defaultOutputDir ??
+                  '未确定';
+              final canOpen = job.outputPath?.isNotEmpty == true &&
+                  status == JobStatus.success;
+              return Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '输出路径：$outputText',
+                      style: state.buildTextStyle(12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: '打开输出文件',
+                    onPressed: canOpen ? () => logic.openOutputFile(job) : null,
+                    icon: const Icon(Icons.open_in_new),
+                    color: canOpen ? AppColors.primary : AppColors.divider,
+                  ),
+                ],
+              );
+            }),
             const SizedBox(height: 4),
             Obx(() {
               final originalText = job.originalBytes.value > 0
@@ -353,6 +380,11 @@ class _CompressPageState extends State<CompressPage> {
                 ],
               );
             }),
+            const SizedBox(height: 4),
+            Obx(() => Text(
+                  '耗时：${job.formattedElapsed}',
+                  style: state.buildTextStyle(12),
+                )),
             const SizedBox(height: 8),
             Obx(
               () => LinearProgressIndicator(

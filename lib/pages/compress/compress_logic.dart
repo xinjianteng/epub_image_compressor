@@ -138,6 +138,9 @@ class CompressLogic extends GetxController {
     job.progress.value = 0;
     job.message.value = '处理中...';
     job.logs.clear();
+    job.elapsed.value = null;
+    job.startTime = DateTime.now();
+    job.endTime = null;
     job.originalBytes.value = await _getFileSize(job.inputPath);
 
     final targetDir = outputDir.value.isNotEmpty
@@ -148,7 +151,7 @@ class CompressLogic extends GetxController {
     _log(job, '输出目录：$targetDir');
 
     try {
-      final summary = await _compressor.compressEpub(
+      final summary = await _compressor.compressEpubInIsolate(
         inputPath: job.inputPath,
         outputDir: targetDir,
         options: currentOptions,
@@ -166,6 +169,7 @@ class CompressLogic extends GetxController {
       job.outputPath = summary.outputPath;
       job.savedBytes.value = summary.savedBytes;
       job.compressedBytes.value = await _getFileSize(summary.outputPath);
+      job.elapsed.value = summary.elapsed;
 
       if (_token?.isCancelled == true || summary.cancelled) {
         job.status.value = JobStatus.cancelled;
@@ -183,6 +187,12 @@ class CompressLogic extends GetxController {
       job.message.value = '失败：$e';
       _log(job, '错误：$e');
     } finally {
+      job.endTime = DateTime.now();
+      if (job.startTime != null &&
+          job.endTime != null &&
+          job.elapsed.value == null) {
+        job.elapsed.value = job.endTime!.difference(job.startTime!);
+      }
       job.progress.value = 1.0;
       state.timeline.add('[${job.fileName}] ${job.message.value}');
       _trimLogs(state.timeline);
@@ -264,6 +274,31 @@ class CompressLogic extends GetxController {
       return await File(path).length();
     } catch (_) {
       return 0;
+    }
+  }
+
+  Future<void> openOutputFile(CompressorJob job) async {
+    final path = job.outputPath;
+    if (path == null || path.isEmpty) {
+      Get.snackbar(
+        '提示',
+        '输出文件尚未生成',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: AppColors.textPrimary,
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
+    try {
+      await AppUtil.openFile(path);
+    } catch (e) {
+      Get.snackbar(
+        '提示',
+        '无法打开文件：$e',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: AppColors.textPrimary,
+        duration: const Duration(seconds: 2),
+      );
     }
   }
 }

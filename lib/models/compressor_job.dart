@@ -2,7 +2,6 @@ import 'package:epub_image_compressor/utils/app_util.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
-
 /// 作业状态枚举
 /// queued: 队列中
 /// running: 运行中
@@ -10,7 +9,6 @@ import 'package:path/path.dart' as p;
 /// failed: 失败
 /// cancelled: 已取消
 enum JobStatus { queued, running, success, failed, cancelled }
-
 
 /// 压缩作业类
 ///
@@ -55,9 +53,17 @@ class CompressorJob {
   /// 日志列表
   final RxList<String> logs = <String>[].obs;
 
+  /// 处理耗时
+  final Rxn<Duration> elapsed = Rxn<Duration>();
+
+  /// 开始时间
+  DateTime? startTime;
+
+  /// 结束时间
+  DateTime? endTime;
+
   /// 获取输入文件的文件名
   String get fileName => p.basename(inputPath);
-
 
   /// 获取默认输出目录路径
   ///
@@ -79,10 +85,14 @@ class CompressorJob {
   /// 添加日志信息
   ///
   /// [text] 要添加的日志文本
-  void addLog(String text) => logs.add(AppUtil.getTime()+text);
+  void addLog(String text) => logs.add(AppUtil.getTime() + text);
 
   String get formattedOriginalSize => AppUtil.formatSize(originalBytes.value);
 
-  String get formattedCompressedSize =>
-      compressedBytes.value > 0 ? AppUtil.formatSize(compressedBytes.value) : '--';
- }
+  String get formattedCompressedSize => compressedBytes.value > 0
+      ? AppUtil.formatSize(compressedBytes.value)
+      : '--';
+
+  String get formattedElapsed =>
+      elapsed.value != null ? AppUtil.formatDuration(elapsed.value!) : '--';
+}
